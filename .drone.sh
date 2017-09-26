@@ -22,3 +22,8 @@ GOOS=linux GOARCH=arm   CGO_ENABLED=0 GOARM=7 go build -a -tags netgo -o release
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0         go build -a -tags netgo -o release/linux/amd64/drone-docker-ecr github.com/drone-plugins/drone-docker/cmd/drone-docker-ecr
 GOOS=linux GOARCH=arm64 CGO_ENABLED=0         go build -a -tags netgo -o release/linux/arm64/drone-docker-ecr github.com/drone-plugins/drone-docker/cmd/drone-docker-ecr
 GOOS=linux GOARCH=arm   CGO_ENABLED=0 GOARM=7 go build -a -tags netgo -o release/linux/arm/drone-docker-ecr   github.com/drone-plugins/drone-docker/cmd/drone-docker-ecr
+
+docker build --rm -f docker/Dockerfile -t beenverifiedinc/drone_docker .
+docker build --rm -f docker/ecr/Dockerfile -t beenverifiedinc/drone_ecr .
+docker push beenverifiedinc/drone_docker
+docker push beenverifiedinc/drone_ecr
