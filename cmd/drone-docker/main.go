@@ -136,6 +136,11 @@ func main() {
 			Usage:  "build target",
 			EnvVar: "PLUGIN_BUILD_TARGET",
 		},
+		cli.StringFlag{
+			Name:   "cache-from",
+			Usage:  "cache from",
+			EnvVar: "PLUGIN_CACHE_FROM",
+		},
 		cli.BoolFlag{
 			Name:   "squash",
 			Usage:  "squash the layers at build time",
@@ -209,6 +214,7 @@ func run(c *cli.Context) error {
 			Target:      c.String("target"),
 			Squash:      c.Bool("squash"),
 			Pull:        c.BoolT("pull-image"),
+			CacheFrom:   c.String("cache-from"),
 			Compress:    c.Bool("compress"),
 			Repo:        c.String("repo"),
 			LabelSchema: c.StringSlice("label-schema"),

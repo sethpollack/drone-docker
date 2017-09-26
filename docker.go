@@ -47,6 +47,7 @@ type (
 		Target      string   // Docker build target
 		Squash      bool     // Docker build squash
 		Pull        bool     // Docker build pull
+		CacheFrom   string   // Docker build cache-from
 		Compress    bool     // Docker build compress
 		Repo        string   // Docker build repository
 		LabelSchema []string // Label schema map
@@ -99,6 +100,15 @@ func (p Plugin) Exec() error {
 		}
 	} else {
 		fmt.Println("Registry credentials not provided. Guest mode enabled.")
+	}
+
+	// pre-pull cache image
+	if p.Build.CacheFrom != "" {
+		cmd := commandPull(p.Build.CacheFrom)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		trace(cmd)
+		cmd.Run()
 	}
 
 	if p.Build.Squash && !p.Daemon.Experimental {
@@ -157,6 +167,10 @@ func commandLogin(login Login) *exec.Cmd {
 	)
 }
 
+func commandPull(repo string) *exec.Cmd {
+	return exec.Command(dockerExe, "pull", repo)
+}
+
 func commandLoginEmail(login Login) *exec.Cmd {
 	return exec.Command(
 		dockerExe, "login",
@@ -198,6 +212,9 @@ func commandBuild(build Build) *exec.Cmd {
 	}
 	if build.Target != "" {
 		args = append(args, "--target", build.Target)
+	}
+	if build.CacheFrom != "" {
+		args = append(args, "--cache-from", build.CacheFrom)
 	}
 	for _, arg := range build.ArgsEnv {
 		addProxyValue(&build, arg)
