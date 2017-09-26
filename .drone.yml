@@ -40,7 +40,7 @@ pipeline:
   publish_ecr:
     image: plugins/docker
     repo: plugins/ecr
-    tags: [ "latest", "17", "17.05" ]
+    tags: [ "latest", "17", "17.07" ]
     secrets: [ docker_username, docker_password ]
     dockerfile: docker/ecr/Dockerfile
     when:
