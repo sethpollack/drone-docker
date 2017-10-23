@@ -115,11 +115,10 @@ func main() {
 			EnvVar: "PLUGIN_CONTEXT",
 		},
 		cli.StringSliceFlag{
-			Name:     "tags",
-			Usage:    "build tags",
-			Value:    &cli.StringSlice{"latest"},
-			EnvVar:   "PLUGIN_TAG,PLUGIN_TAGS",
-			FilePath: ".tags",
+			Name:   "tags",
+			Usage:  "build tags",
+			Value:  &cli.StringSlice{"latest"},
+			EnvVar: "PLUGIN_TAG,PLUGIN_TAGS",
 		},
 		cli.StringSliceFlag{
 			Name:   "args",
