@@ -128,10 +128,7 @@ func (p Plugin) Exec() error {
 	cmds = append(cmds, commandVersion()) // docker version
 	cmds = append(cmds, commandInfo())    // docker info
 
-	// pre-pull cache images
-	for _, img := range p.Build.CacheFrom {
-		cmds = append(cmds, commandPull(img))
-	}
+	p.Build.CacheFrom = filterCacheFrom(p.Build.CacheFrom)
 
 	cmds = append(cmds, commandBuild(p.Build)) // docker build
 
@@ -155,13 +152,7 @@ func (p Plugin) Exec() error {
 		trace(cmd)
 
 		err := cmd.Run()
-		if err != nil && isCommandPull(cmd.Args) {
-			fmt.Printf("Could not pull cache-from image %s. Ignoring...\n", cmd.Args[2])
-		} else if err != nil && isCommandPrune(cmd.Args) {
-			fmt.Printf("Could not prune system containers. Ignoring...\n")
-		} else if err != nil && isCommandRmi(cmd.Args) {
-			fmt.Printf("Could not remove image %s. Ignoring...\n", cmd.Args[2])
-		} else if err != nil {
+		if err != nil {
 			return err
 		}
 	}
@@ -182,9 +173,17 @@ func commandLogin(login Login) *exec.Cmd {
 	)
 }
 
-// helper to check if args match "docker pull <image>"
-func isCommandPull(args []string) bool {
-	return len(args) > 2 && args[1] == "pull"
+func filterCacheFrom(args []string) []string {
+	repos := []string{}
+	for _, repo := range args {
+		err := exec.Command(dockerExe, "pull", repo).Run()
+		if err != nil {
+			fmt.Printf("Could not pull cache-from image %s. Ignoring...\n", repo)
+		} else {
+			repos = append(repos, repo)
+		}
+	}
+	return repos
 }
 
 func commandPull(repo string) *exec.Cmd {
@@ -372,7 +371,6 @@ func commandDaemon(daemon Daemon) *exec.Cmd {
 	}
 	return exec.Command(dockerdExe, args...)
 }
-
 
 // helper to check if args match "docker prune"
 func isCommandPrune(args []string) bool {

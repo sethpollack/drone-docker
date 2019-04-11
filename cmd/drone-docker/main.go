@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -126,6 +127,11 @@ func main() {
 			Value:    &cli.StringSlice{"latest"},
 			EnvVar:   "PLUGIN_TAG,PLUGIN_TAGS",
 			FilePath: ".tags",
+		},
+		cli.StringSliceFlag{
+			Name:   "checksums",
+			Usage:  "tags from file checksums",
+			EnvVar: "PLUGIN_CHECKSUM,PLUGIN_CHECKSUMS",
 		},
 		cli.BoolFlag{
 			Name:   "tags.auto",
@@ -311,6 +317,21 @@ func run(c *cli.Context) error {
 			logrus.Printf("skipping automated docker build for %s", c.String("commit.ref"))
 			return nil
 		}
+	}
+
+	for _, checksum := range c.StringSlice("checksums") {
+		hash, err := docker.Checksum(checksum)
+		if err != nil {
+			return err
+		}
+		plugin.Build.Tags = append(
+			plugin.Build.Tags,
+			hash,
+		)
+		plugin.Build.CacheFrom = append(
+			plugin.Build.CacheFrom,
+			fmt.Sprintf("%s:%s", plugin.Build.Repo, hash),
+		)
 	}
 
 	return plugin.Exec()
