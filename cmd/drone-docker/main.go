@@ -301,6 +301,9 @@ func run(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
+
+		hash = hash + c.String("target")
+
 		plugin.Build.Tags = append(
 			plugin.Build.Tags,
 			hash,
