@@ -39,26 +39,26 @@ type (
 
 	// Build defines Docker build parameters.
 	Build struct {
-		Remote        string   // Git remote URL
-		Name          string   // Docker build using default named tag
-		Dockerfile    string   // Docker build Dockerfile
-		Context       string   // Docker build context
-		Tags          []string // Docker build tags
-		Args          []string // Docker build args
-		ArgsEnv       []string // Docker build args from env
-		Target        string   // Docker build target
-		Squash        bool     // Docker build squash
-		Pull          bool     // Docker build pull
-		CacheFrom     []string // Docker build cache-from
-		Compress      bool     // Docker build compress
-		Repo          string   // Docker build repository
-		LabelSchema   []string // label-schema Label map
+		Remote      string   // Git remote URL
+		Name        string   // Docker build using default named tag
+		Dockerfile  string   // Docker build Dockerfile
+		Context     string   // Docker build context
+		Tags        []string // Docker build tags
+		Args        []string // Docker build args
+		ArgsEnv     []string // Docker build args from env
+		Target      string   // Docker build target
+		Squash      bool     // Docker build squash
+		Pull        bool     // Docker build pull
+		CacheFrom   []string // Docker build cache-from
+		Compress    bool     // Docker build compress
+		Repo        string   // Docker build repository
+		LabelSchema []string // label-schema Label map
+		Labels      []string // Label map
 		AutoLabel     bool     // auto-label bool
-		Labels        []string // Label map
-		Link          string   // Git repo link
-		NoCache       bool     // Docker build no-cache
-		AddHost       []string // Docker build add-host
-		Quiet         bool     // Docker build quiet
+		NoCache     bool     // Docker build no-cache
+		AddHost     []string // Docker build add-host
+		Quiet       bool     // Docker build quiet
+		Secrets     []string
 	}
 
 	// Plugin defines the Docker plugin parameters.
@@ -85,6 +85,9 @@ func (p Plugin) Exec() error {
 		err := cmd.Run()
 		if err == nil {
 			break
+		}
+		if !p.Daemon.Disabled {
+			p.startDaemon()
 		}
 		time.Sleep(time.Second * 1)
 	}
@@ -245,6 +248,9 @@ func commandBuild(build Build) *exec.Cmd {
 	}
 	for _, host := range build.AddHost {
 		args = append(args, "--add-host", host)
+	}
+	for _, arg := range build.Secrets {
+		args = append(args, "--secret", strings.Replace(arg, " ", ",", 1))
 	}
 	if build.Target != "" {
 		args = append(args, "--target", build.Target)
