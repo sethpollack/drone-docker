@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	docker "github.com/drone-plugins/drone-docker"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-
-	docker "github.com/drone-plugins/drone-docker"
 )
 
 var (
@@ -132,6 +131,11 @@ func main() {
 			Name:   "checksums",
 			Usage:  "tags from file checksums",
 			EnvVar: "PLUGIN_CHECKSUM,PLUGIN_CHECKSUMS",
+		},
+		cli.StringSliceFlag{
+			Name:   "secrets",
+			Usage:  "secret args",
+			EnvVar: "PLUGIN_SECRET,PLUGIN_SECRETS",
 		},
 		cli.BoolFlag{
 			Name:   "tags.auto",
@@ -273,26 +277,27 @@ func run(c *cli.Context) error {
 			Config:   c.String("docker.config"),
 		},
 		Build: docker.Build{
-			Remote:        c.String("remote.url"),
-			Name:          c.String("commit.sha"),
-			Dockerfile:    c.String("dockerfile"),
-			Context:       c.String("context"),
-			Tags:          c.StringSlice("tags"),
-			Args:          c.StringSlice("args"),
-			ArgsEnv:       c.StringSlice("args-from-env"),
-			Target:        c.String("target"),
-			Squash:        c.Bool("squash"),
-			Pull:          c.BoolT("pull-image"),
-			CacheFrom:     c.StringSlice("cache-from"),
-			Compress:      c.Bool("compress"),
-			Repo:          c.String("repo"),
-			Labels:        c.StringSlice("custom-labels"),
-			LabelSchema:   c.StringSlice("label-schema"),
+			Remote:      c.String("remote.url"),
+			Name:        c.String("commit.sha"),
+			Dockerfile:  c.String("dockerfile"),
+			Context:     c.String("context"),
+			Tags:        c.StringSlice("tags"),
+			Args:        c.StringSlice("args"),
+			ArgsEnv:     c.StringSlice("args-from-env"),
+			Target:      c.String("target"),
+			Squash:      c.Bool("squash"),
+			Pull:        c.BoolT("pull-image"),
+			CacheFrom:   c.StringSlice("cache-from"),
+			Compress:    c.Bool("compress"),
+			Repo:        c.String("repo"),
+			Labels:      c.StringSlice("custom-labels"),
+			LabelSchema: c.StringSlice("label-schema"),
 			AutoLabel:     c.BoolT("auto-label"),
 			Link:          c.String("link"),
-			NoCache:       c.Bool("no-cache"),
-			AddHost:       c.StringSlice("add-host"),
-			Quiet:         c.Bool("quiet"),
+			NoCache:     c.Bool("no-cache"),
+			AddHost:     c.StringSlice("add-host"),
+			Quiet:       c.Bool("quiet"),
+			Secrets:     c.StringSlice("secrets"),
 		},
 		Daemon: docker.Daemon{
 			Registry:      c.String("docker.registry"),
