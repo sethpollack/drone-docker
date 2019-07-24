@@ -1,10 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 FROM docker:19.03.8-dind
 
 ENV DOCKER_HOST=unix:///var/run/docker.sock
 =======
 FROM docker:19.03.9
 >>>>>>> bump docker to 19.03.0-beta1
+=======
+FROM docker:19.03.9
+=======
+FROM docker:19.03.0-dind
+>>>>>>> add secrets support
+>>>>>>> add secrets support
 
 ADD release/linux/amd64/drone-docker /bin/
 ENTRYPOINT ["/usr/local/bin/dockerd-entrypoint.sh", "/bin/drone-docker"]

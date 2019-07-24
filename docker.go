@@ -57,6 +57,7 @@ type (
 		NoCache     bool     // Docker build no-cache
 		AddHost     []string // Docker build add-host
 		Quiet       bool     // Docker build quiet
+		Secrets     []string
 	}
 
 	// Plugin defines the Docker plugin parameters.
@@ -241,8 +242,13 @@ func commandBuild(build Build) *exec.Cmd {
 	for _, arg := range build.Args {
 		args = append(args, "--build-arg", arg)
 	}
+<<<<<<< HEAD
 	for _, host := range build.AddHost {
 		args = append(args, "--add-host", host)
+=======
+	for _, arg := range build.Secrets {
+		args = append(args, "--secret", strings.Replace(arg, " ", ",", 1))
+>>>>>>> add secrets support
 	}
 	if build.Target != "" {
 		args = append(args, "--target", build.Target)
