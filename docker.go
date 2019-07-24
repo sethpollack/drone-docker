@@ -53,6 +53,7 @@ type (
 		LabelSchema []string // label-schema Label map
 		Labels      []string // Label map
 		NoCache     bool     // Docker build no-cache
+		Secrets     []string
 	}
 
 	// Plugin defines the Docker plugin parameters.
@@ -232,6 +233,9 @@ func commandBuild(build Build) *exec.Cmd {
 	}
 	for _, arg := range build.Args {
 		args = append(args, "--build-arg", arg)
+	}
+	for _, arg := range build.Secrets {
+		args = append(args, "--secret", strings.Replace(arg, " ", ",", 1))
 	}
 	if build.Target != "" {
 		args = append(args, "--target", build.Target)

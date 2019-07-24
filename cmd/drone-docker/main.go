@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	docker "github.com/drone-plugins/drone-docker"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-
-	docker "github.com/drone-plugins/drone-docker"
 )
 
 var (
@@ -132,6 +131,11 @@ func main() {
 			Name:   "checksums",
 			Usage:  "tags from file checksums",
 			EnvVar: "PLUGIN_CHECKSUM,PLUGIN_CHECKSUMS",
+		},
+		cli.StringSliceFlag{
+			Name:   "secrets",
+			Usage:  "secret args",
+			EnvVar: "PLUGIN_SECRET,PLUGIN_SECRETS",
 		},
 		cli.BoolFlag{
 			Name:   "tags.auto",
@@ -263,6 +267,7 @@ func run(c *cli.Context) error {
 			Labels:      c.StringSlice("custom-labels"),
 			LabelSchema: c.StringSlice("label-schema"),
 			NoCache:     c.Bool("no-cache"),
+			Secrets:     c.StringSlice("secrets"),
 		},
 		Daemon: docker.Daemon{
 			Registry:      c.String("docker.registry"),
