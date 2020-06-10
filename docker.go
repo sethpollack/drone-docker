@@ -182,7 +182,7 @@ func commandLogin(login Login) *exec.Cmd {
 func filterCacheFrom(args []string) []string {
 	repos := []string{}
 	for _, repo := range args {
-		err := exec.Command(dockerExe, "pull", repo).Run()
+		err := commandPull(repo).Run()
 		if err != nil {
 			fmt.Printf("Could not pull cache-from image %s. Ignoring...\n", repo)
 		} else {
