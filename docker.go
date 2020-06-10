@@ -177,7 +177,7 @@ func commandLogin(login Login) *exec.Cmd {
 func filterCacheFrom(args []string) []string {
 	repos := []string{}
 	for _, repo := range args {
-		err := exec.Command(dockerExe, "pull", repo).Run()
+		err := commandPull(repo).Run()
 		if err != nil {
 			fmt.Printf("Could not pull cache-from image %s. Ignoring...\n", repo)
 		} else {
@@ -242,13 +242,11 @@ func commandBuild(build Build) *exec.Cmd {
 	for _, arg := range build.Args {
 		args = append(args, "--build-arg", arg)
 	}
-<<<<<<< HEAD
 	for _, host := range build.AddHost {
 		args = append(args, "--add-host", host)
-=======
+	}
 	for _, arg := range build.Secrets {
 		args = append(args, "--secret", strings.Replace(arg, " ", ",", 1))
->>>>>>> add secrets support
 	}
 	if build.Target != "" {
 		args = append(args, "--target", build.Target)

@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
@@ -29,7 +30,9 @@ func main() {
 		create           = parseBoolOrDefault(false, getenv("PLUGIN_CREATE_REPOSITORY", "ECR_CREATE_REPOSITORY"))
 		lifecyclePolicy  = getenv("PLUGIN_LIFECYCLE_POLICY")
 		repositoryPolicy = getenv("PLUGIN_REPOSITORY_POLICY")
-		assumeRole       = getenv("PLUGIN_ASSUME_ROLE")
+		assumeRole       = getenv("PLUGIN_ASSUME_ROLE", "AWS_ROLE_ARN")
+		token            = getenv("AWS_WEB_IDENTITY_TOKEN_FILE")
+		sessionName      = getenv("AWS_ROLE_SESSION_NAME")
 	)
 
 	// set the region
@@ -49,7 +52,7 @@ func main() {
 		log.Fatal(fmt.Sprintf("error creating aws session: %v", err))
 	}
 
-	svc := getECRClient(sess, assumeRole)
+	svc := getECRClient(sess, assumeRole, token, sessionName)
 	username, password, defaultRegistry, err := getAuthInfo(svc)
 
 	if registry == "" {
@@ -186,11 +189,19 @@ func getenv(key ...string) (s string) {
 	return
 }
 
-func getECRClient(sess *session.Session, role string) *ecr.ECR {
+func getECRClient(sess *session.Session, role, token, sessionName string) *ecr.ECR {
 	if role == "" {
 		return ecr.New(sess)
 	}
 	return ecr.New(sess, &aws.Config{
-		Credentials: stscreds.NewCredentials(sess, role),
+		Credentials: getECRCreds(sess, role, token, sessionName),
 	})
+}
+
+func getECRCreds(sess *session.Session, role, token, sessionName string) *credentials.Credentials {
+	if token != "" {
+		return stscreds.NewWebIdentityCredentials(sess, role, sessionName, token)
+	}
+
+	return stscreds.NewCredentials(sess, role)
 }
