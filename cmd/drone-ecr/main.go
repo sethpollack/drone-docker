@@ -104,7 +104,7 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err = cmd.Run(); err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
