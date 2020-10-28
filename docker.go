@@ -81,7 +81,7 @@ func (p Plugin) Exec() error {
 
 	// poll the docker daemon until it is started. This ensures the daemon is
 	// ready to accept connections before we proceed.
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 30; i++ {
 		cmd := commandInfo()
 		err := cmd.Run()
 		if err == nil {
