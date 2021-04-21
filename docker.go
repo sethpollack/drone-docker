@@ -53,8 +53,9 @@ type (
 		Compress    bool     // Docker build compress
 		Repo        string   // Docker build repository
 		LabelSchema []string // label-schema Label map
+		AutoLabel   bool     // auto-label bool
 		Labels      []string // Label map
-		AutoLabel     bool     // auto-label bool
+		Link        string   // Git repo link
 		NoCache     bool     // Docker build no-cache
 		AddHost     []string // Docker build add-host
 		Quiet       bool     // Docker build quiet
